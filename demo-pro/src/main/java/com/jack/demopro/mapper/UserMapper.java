@@ -1,11 +1,18 @@
 package com.jack.demopro.mapper;
 
+import com.jack.demopro.model.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.jack.demopro.model.User;
 
-import java.util.List;
-
+/**
+* @author zhoushaoxiang
+* @description 针对表【user(用户)】的数据库操作Mapper
+* @createDate 2022-11-25 20:32:58
+* @Entity generator.domain.User
+*/
 public interface UserMapper extends BaseMapper<User> {
 
-    List<User> selectList(Object o);
 }
+
+
+
+
