@@ -6,6 +6,6 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/jack
     username: root
-    password: R_c83aQtuk5e
+    password: 123456
 server:
   port: 8080

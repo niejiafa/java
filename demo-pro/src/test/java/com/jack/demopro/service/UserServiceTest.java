@@ -17,8 +17,8 @@ class UserServiceTest {
     @Test
     public void testAddUser() {
         User user = new User();
-        user.setUsername("Bob");
-        user.setUserAccount("Tiger");
+        user.setUsername("Rose");
+        user.setUserAccount("Cat");
         user.setAvataUrl("https://profile.csdnimg.cn/3/C/4/3_weixin_44171249");
         user.setGender(0);
         user.setUserPassword("123");
@@ -32,5 +32,20 @@ class UserServiceTest {
         boolean save = userService.save(user);
         System.out.println(user.getId());
         Assertions.assertTrue(save);
+    }
+
+    @Test
+    void userRegister() {
+        String userAccount = "jack";
+        String password = "123456";
+        String checkPassword = "123456";
+        long result = userService.userRegister(userAccount, password, checkPassword);
+        Assertions.assertEquals("-1", result);
+
+        userAccount = "ja";
+        password = "123456";
+        checkPassword = "123456";
+        result = userService.userRegister(userAccount, password, checkPassword);
+        Assertions.assertEquals("-1", result);
     }
 }
