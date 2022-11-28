@@ -1,17 +1,20 @@
 package com.jack.demopro.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.jack.demopro.model.domain.User;
 import com.jack.demopro.model.domain.request.UserLoginRequest;
 import com.jack.demopro.model.domain.request.UserRegisterRequest;
 import com.jack.demopro.service.UserService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.jack.demopro.constant.UserConstant.ADMIN_ROLE;
+import static com.jack.demopro.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * 用户接口
@@ -53,5 +56,40 @@ public class UserController {
         }
 
         return userService.doLogin(userAccount, userPassword, request);
+    }
+
+    @GetMapping("/search")
+    public List<User> searchUser(String userName, HttpServletRequest request) {
+
+        if (!this.isAdmin(request)) {
+            return new ArrayList<>();
+        }
+
+        QueryWrapper queryWrapper = new QueryWrapper();
+        if (StringUtils.isNotBlank(userName)) {
+            queryWrapper.like("username", userName);
+        }
+
+        return userService.list();
+    }
+
+    @PostMapping("/delete")
+    public boolean deleteUser(@RequestBody long id, HttpServletRequest request) {
+        if (!this.isAdmin(request)) {
+            return false;
+        }
+
+        if (id <= 0) {
+            return false;
+        }
+
+        return userService.removeById(id);
+    }
+
+    private boolean isAdmin(HttpServletRequest request) {
+        Object object = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) object;
+
+        return user != null && user.getRole() != ADMIN_ROLE;
     }
 }

@@ -2,6 +2,7 @@ package com.jack.demopro.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jack.demopro.constant.UserConstant;
 import com.jack.demopro.model.domain.User;
 import com.jack.demopro.mapper.UserMapper;
 import com.jack.demopro.service.UserService;
@@ -30,11 +31,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     /**
      * 盐值 混淆密码
      */
-    private static final String SALT = "jack";
-    /**
-     * 用户登录态键
-     */
-    private static final String USER_LOGIN_STATE = "userLoginState";
+    public static final String SALT = "jack";
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
@@ -110,7 +107,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return null;
         }
 
-        // 3.记录用户登录态
+        // 3.用户脱敏
         User safetyUser = new User();
         safetyUser.setId(user.getId());
         safetyUser.setUsername(user.getUsername());
@@ -122,8 +119,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safetyUser.setUserStatus(user.getUserStatus());
         safetyUser.setCreateTime(user.getCreateTime());
 
-        // 4.用户脱敏
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        // 4.记录用户登录态
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
 
         return safetyUser;
     }
