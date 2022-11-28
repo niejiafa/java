@@ -1,4 +1,4 @@
-package com.jack.demopro.model.domain;
+package generator.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 

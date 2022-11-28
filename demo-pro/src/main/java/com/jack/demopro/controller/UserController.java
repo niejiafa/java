@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.jack.demopro.constant.UserConstant.ADMIN_ROLE;
 import static com.jack.demopro.constant.UserConstant.USER_LOGIN_STATE;
@@ -61,7 +62,7 @@ public class UserController {
     @GetMapping("/search")
     public List<User> searchUser(String userName, HttpServletRequest request) {
 
-        if (!this.isAdmin(request)) {
+        if (!isAdmin(request)) {
             return new ArrayList<>();
         }
 
@@ -70,12 +71,16 @@ public class UserController {
             queryWrapper.like("username", userName);
         }
 
-        return userService.list();
+        List<User> userList= userService.list();
+        return userList.stream().map(user -> {
+            user.setUserPassword(null);
+            return user;
+        }).collect(Collectors.toList());
     }
 
     @PostMapping("/delete")
     public boolean deleteUser(@RequestBody long id, HttpServletRequest request) {
-        if (!this.isAdmin(request)) {
+        if (!isAdmin(request)) {
             return false;
         }
 
@@ -90,6 +95,6 @@ public class UserController {
         Object object = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) object;
 
-        return user != null && user.getRole() != ADMIN_ROLE;
+        return user != null && user.getUserRole() == ADMIN_ROLE;
     }
 }

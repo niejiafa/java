@@ -2,7 +2,6 @@ package com.jack.demopro.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jack.demopro.constant.UserConstant;
 import com.jack.demopro.model.domain.User;
 import com.jack.demopro.mapper.UserMapper;
 import com.jack.demopro.service.UserService;
@@ -13,9 +12,10 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.jack.demopro.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * @author zhoushaoxiang
@@ -116,11 +116,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safetyUser.setGender(user.getGender());
         safetyUser.setPhone(user.getPhone());
         safetyUser.setEmail(user.getEmail());
+        safetyUser.setUserRole(user.getUserRole());
         safetyUser.setUserStatus(user.getUserStatus());
         safetyUser.setCreateTime(user.getCreateTime());
 
         // 4.记录用户登录态
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        request.getSession().setAttribute(USER_LOGIN_STATE, user);
 
         return safetyUser;
     }
