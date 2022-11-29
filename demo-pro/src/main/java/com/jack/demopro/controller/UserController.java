@@ -73,8 +73,7 @@ public class UserController {
 
         List<User> userList= userService.list();
         return userList.stream().map(user -> {
-            user.setUserPassword(null);
-            return user;
+            return userService.getSafetyUser(user);
         }).collect(Collectors.toList());
     }
 
