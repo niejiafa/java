@@ -59,6 +59,21 @@ public class UserController {
         return userService.doLogin(userAccount, userPassword, request);
     }
 
+    @GetMapping("/current")
+    public User getCurrent(HttpServletRequest request) {
+        Object object = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) object;
+        if (user == null) {
+            return null;
+        }
+
+        Long userId = user.getId();
+        // todo 校验用户是否合法
+        User currentUser = userService.getById(userId);
+
+        return userService.getSafetyUser(currentUser);
+    }
+
     @GetMapping("/search")
     public List<User> searchUser(String userName, HttpServletRequest request) {
 
