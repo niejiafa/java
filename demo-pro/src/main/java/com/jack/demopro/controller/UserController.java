@@ -1,6 +1,10 @@
 package com.jack.demopro.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.jack.demopro.common.BaseResponse;
+import com.jack.demopro.common.ErrorCode;
+import com.jack.demopro.common.ResultUtils;
+import com.jack.demopro.exception.BusinessException;
 import com.jack.demopro.model.domain.User;
 import com.jack.demopro.model.domain.request.UserLoginRequest;
 import com.jack.demopro.model.domain.request.UserRegisterRequest;
@@ -29,9 +33,9 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public Long userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "参数为空");
         }
 
         String userAccount = userRegisterRequest.getUserAccount();
@@ -41,44 +45,59 @@ public class UserController {
             return null;
         }
 
-        return userService.userRegister(userAccount, userPassword, checkPassword);
+        long result = userService.userRegister(userAccount, userPassword, checkPassword);
+        return ResultUtils.success(result);
     }
 
     @PostMapping("/login")
-    public User userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<User> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "参数为空");
         }
 
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
         if (StringUtils.isAnyBlank(userAccount, userAccount)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "参数为空");
         }
 
-        return userService.doLogin(userAccount, userPassword, request);
+        User user = userService.doLogin(userAccount, userPassword, request);
+        return ResultUtils.success(user);
+    }
+
+    @PostMapping("/logout")
+    public BaseResponse<Integer> userLogout(HttpServletRequest request) {
+        if (request == null) {
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "参数为空");
+        }
+
+        Integer result = userService.userLogout(request);
+
+        return ResultUtils.success(result);
     }
 
     @GetMapping("/current")
-    public User getCurrent(HttpServletRequest request) {
+    public BaseResponse<User> getCurrent(HttpServletRequest request) {
         Object object = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) object;
         if (user == null) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "参数为空");
         }
 
         Long userId = user.getId();
         // todo 校验用户是否合法
         User currentUser = userService.getById(userId);
 
-        return userService.getSafetyUser(currentUser);
+        User result = userService.getSafetyUser(currentUser);
+
+        return ResultUtils.success(result);
     }
 
     @GetMapping("/search")
-    public List<User> searchUser(String userName, HttpServletRequest request) {
+    public BaseResponse<List<User>> searchUser(String userName, HttpServletRequest request) {
 
         if (!isAdmin(request)) {
-            return new ArrayList<>();
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
         }
 
         QueryWrapper queryWrapper = new QueryWrapper();
@@ -87,22 +106,26 @@ public class UserController {
         }
 
         List<User> userList= userService.list();
-        return userList.stream().map(user -> {
+        List<User> list = userList.stream().map(user -> {
             return userService.getSafetyUser(user);
         }).collect(Collectors.toList());
+
+        return ResultUtils.success(list);
     }
 
     @PostMapping("/delete")
-    public boolean deleteUser(@RequestBody long id, HttpServletRequest request) {
+    public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
         if (!isAdmin(request)) {
-            return false;
+            throw new BusinessException(ErrorCode.NO_AUTH, "无权限");
         }
 
         if (id <= 0) {
-            return false;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "参数为空");
         }
 
-        return userService.removeById(id);
+        boolean result = userService.removeById(id);
+
+        return ResultUtils.success(result);
     }
 
     private boolean isAdmin(HttpServletRequest request) {

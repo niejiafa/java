@@ -2,6 +2,8 @@ package com.jack.demopro.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jack.demopro.common.ErrorCode;
+import com.jack.demopro.exception.BusinessException;
 import com.jack.demopro.model.domain.User;
 import com.jack.demopro.mapper.UserMapper;
 import com.jack.demopro.service.UserService;
@@ -37,29 +39,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
         // 1. 校验
         if (StringUtils.isAnyBlank(userAccount, userPassword, checkPassword)) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "参数为空");
         }
         if (userAccount.length() < 4) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "账号过短");
         }
         if (userPassword.length() < 8 || checkPassword.length() < 8) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "密码过短");
         }
         // 账户不能包含特殊字符
         Matcher matcher = Pattern.compile("^[/|\\\\]*$").matcher(userAccount);
         if (matcher.find()) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "账户包含特殊字符");
         }
         // 密码与校验密码相同
         if (!userPassword.equals(checkPassword)) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "密码与校验密码不相同");
         }
         // 账户不能重复
         QueryWrapper<User> queryWrapper = new QueryWrapper();
         queryWrapper.eq("user_account", userAccount);
         long count = userMapper.selectCount(queryWrapper);
         if (count > 0) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "账户重复");
         }
 
         // 2.加密
@@ -71,7 +73,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUserPassword(md5Password);
         boolean save = this.save(user);
         if (!save) {
-            return -1;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "插入数据失败");
         }
 
         return user.getId();
@@ -81,18 +83,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User doLogin(String userAccount, String userPassword, HttpServletRequest request) {
         // 1. 校验
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "请求数据为空");
         }
         if (userAccount.length() < 4) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "请求数据为空");
         }
         if (userPassword.length() < 8) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "请求数据为空");
         }
         // 账户不能包含特殊字符
         Matcher matcher = Pattern.compile("^[/|\\\\]*$").matcher(userAccount);
         if (matcher.find()) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "账户包含特殊字符");
         }
 
         // 2.加密
@@ -104,7 +106,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = userMapper.selectOne(queryWrapper);
         if (user == null) {
             log.info("user login failed, userAccount cannot match userPassword");
-            return null;
+            throw new BusinessException(ErrorCode.NULL_ERROR, "数据为空");
         }
 
         // 3.用户脱敏
@@ -125,7 +127,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User getSafetyUser(User originUser) {
         if (originUser == null) {
-            return null;
+            throw new BusinessException(ErrorCode.PARMS_ERROR, "请求数据为空");
         }
 
         User safetyUser = new User();
@@ -141,6 +143,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safetyUser.setCreateTime(originUser.getCreateTime());
 
         return safetyUser;
+    }
+
+    /**
+     * 用户注销
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public int userLogout(HttpServletRequest request) {
+        request.getSession().removeAttribute(USER_LOGIN_STATE);
+        return 1;
     }
 }
 
