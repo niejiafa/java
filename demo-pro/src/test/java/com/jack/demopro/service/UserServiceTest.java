@@ -39,6 +39,6 @@ class UserServiceTest {
         String userAccount = "Mary";
         String password = "123456789";
         String checkPassword = "123456789";
-        long result = userService.userRegister(userAccount, password, checkPassword);
+//        long result = userService.userRegister(userAccount, password, checkPassword);
     }
 }
