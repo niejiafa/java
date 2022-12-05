@@ -1,4 +1,4 @@
-package com.jack.demopro.model.domain;
+package com.jack.friends.model.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
 
@@ -43,11 +43,6 @@ public class User implements Serializable {
      * 密码
      */
     private String userPassword;
-
-    /**
-     * 标签列表json
-     */
-    private String tags;
 
     /**
      * 电话

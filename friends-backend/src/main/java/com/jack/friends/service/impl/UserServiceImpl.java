@@ -1,27 +1,23 @@
-package com.jack.demopro.service.impl;
+package com.jack.friends.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.jack.demopro.common.ErrorCode;
-import com.jack.demopro.exception.BusinessException;
-import com.jack.demopro.model.domain.User;
-import com.jack.demopro.mapper.UserMapper;
-import com.jack.demopro.service.UserService;
+import com.jack.friends.common.ErrorCode;
+import com.jack.friends.exception.BusinessException;
+import com.jack.friends.model.domain.User;
+import com.jack.friends.mapper.UserMapper;
+import com.jack.friends.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-import static com.jack.demopro.constant.UserConstant.USER_LOGIN_STATE;
+import static com.jack.friends.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
  * @author zhoushaoxiang
@@ -145,7 +141,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safetyUser.setUserRole(originUser.getUserRole());
         safetyUser.setUserStatus(originUser.getUserStatus());
         safetyUser.setCreateTime(originUser.getCreateTime());
-        safetyUser.setTags(originUser.getTags());
 
         return safetyUser;
     }
@@ -160,27 +155,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public int userLogout(HttpServletRequest request) {
         request.getSession().removeAttribute(USER_LOGIN_STATE);
         return 1;
-    }
-
-    /**
-     * 根据标签查用户
-     *
-     * @param tagNameList
-     * @return
-     */
-    @Override
-    public List<User> searchUserByTags(List<String> tagNameList) {
-        if (CollectionUtils.isEmpty(tagNameList)) {
-            throw new BusinessException(ErrorCode.PARMS_ERROR);
-        }
-
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        for (String tagName : tagNameList) {
-            queryWrapper = queryWrapper.like("tags", tagName);
-        }
-
-        List<User> userList = userMapper.selectList(queryWrapper);
-        return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
     }
 }
 

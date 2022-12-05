@@ -1,10 +1,9 @@
-package com.jack.demopro.service;
+package com.jack.friends.service;
 
-import com.jack.demopro.model.domain.User;
+import com.jack.friends.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * @author zhoushaoxiang
@@ -48,12 +47,4 @@ public interface UserService extends IService<User> {
      * @return
      */
     int userLogout(HttpServletRequest request);
-
-    /**
-     * 根据标签查用户
-     *
-     * @param tagNameList
-     * @return
-     */
-    List<User> searchUserByTags(List<String> tagNameList);
 }

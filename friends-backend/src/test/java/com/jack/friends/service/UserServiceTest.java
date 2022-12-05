@@ -1,10 +1,7 @@
-package com.jack.demopro.service;
-import java.util.Arrays;
+package com.jack.friends.service;
 import java.util.Date;
-import java.util.List;
 
-import com.jack.demopro.model.domain.User;
-import org.junit.Assert;
+import com.jack.friends.model.domain.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,12 +40,5 @@ class UserServiceTest {
         String password = "123456789";
         String checkPassword = "123456789";
 //        long result = userService.userRegister(userAccount, password, checkPassword);
-    }
-
-    @Test
-    void searchUserByTags() {
-        List<String> tagNameList = Arrays.asList("Java", "Python");
-        List<User> userList = userService.searchUserByTags(tagNameList);
-        Assert.assertNull(userList);
     }
 }

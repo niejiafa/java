@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.jack</groupId>
-    <artifactId>demo-pro</artifactId>
+    <artifactId>friends-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>demo-pro</name>
-    <description>demo-pro</description>
+    <name>friends-backend</name>
+    <description>friends-backend</description>
     <properties>
         <java.version>1.8</java.version>
     </properties>
@@ -68,12 +68,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.9.0</version>
         </dependency>
     </dependencies>
 
