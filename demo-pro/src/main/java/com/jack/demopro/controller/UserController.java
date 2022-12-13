@@ -10,6 +10,7 @@ import com.jack.demopro.model.domain.request.UserLoginRequest;
 import com.jack.demopro.model.domain.request.UserRegisterRequest;
 import com.jack.demopro.service.UserService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -111,6 +112,16 @@ public class UserController {
         }).collect(Collectors.toList());
 
         return ResultUtils.success(list);
+    }
+
+    @GetMapping("/search/tags")
+    public BaseResponse<List<User>> searchUsersByTags(List<String> tagNameList) {
+        if (CollectionUtils.isEmpty(tagNameList)) {
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+        }
+        List<User> userList = userService.searchUserByTags(tagNameList);
+
+        return ResultUtils.success(userList);
     }
 
     @PostMapping("/delete")
