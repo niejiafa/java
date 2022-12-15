@@ -97,7 +97,7 @@ public class UserController {
     @GetMapping("/search")
     public BaseResponse<List<User>> searchUser(String userName, HttpServletRequest request) {
 
-        if (!isAdmin(request)) {
+        if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.PARMS_ERROR);
         }
 
@@ -114,6 +114,19 @@ public class UserController {
         return ResultUtils.success(list);
     }
 
+    @PostMapping("/update")
+    public BaseResponse<Integer> updateUser(User user, HttpServletRequest request) {
+        // 校验参数是否为空
+        if (user == null) {
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+
+        int result = userService.updateUser(user, loginUser);
+
+        return ResultUtils.success(result);
+    }
+
     @GetMapping("/search/tags")
     public BaseResponse<List<User>> searchUsersByTags(List<String> tagNameList) {
         if (CollectionUtils.isEmpty(tagNameList)) {
@@ -126,7 +139,7 @@ public class UserController {
 
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
-        if (!isAdmin(request)) {
+        if (!userService.isAdmin(request)) {
             throw new BusinessException(ErrorCode.NO_AUTH, "无权限");
         }
 
@@ -137,12 +150,5 @@ public class UserController {
         boolean result = userService.removeById(id);
 
         return ResultUtils.success(result);
-    }
-
-    private boolean isAdmin(HttpServletRequest request) {
-        Object object = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User) object;
-
-        return user != null && user.getUserRole() == ADMIN_ROLE;
     }
 }

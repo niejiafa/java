@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.jack.demopro.constant.UserConstant.ADMIN_ROLE;
 import static com.jack.demopro.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -118,7 +119,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User safetyUser = getSafetyUser(user);
 
         // 4.记录用户登录态
-        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
 
         return safetyUser;
     }
@@ -189,6 +190,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
             return true;
         }).map(this::getSafetyUser).collect(Collectors.toList());
+    }
+
+    @Override
+    public int updateUser(User user, User loginUser) {
+        Long userId = user.getId();
+        if (userId < 0) {
+            throw new BusinessException(ErrorCode.PARMS_ERROR);
+        }
+        if (!isAdmin(loginUser) && userId != loginUser.getId())
+        {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+
+        User oldUser = userMapper.selectById(userId);
+        if (oldUser == null) {
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        int result = userMapper.updateById(user);
+        return result;
+    }
+
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        if (request == null) {
+            return null;
+        }
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (userObj == null) {
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        return (User) userObj;
+    }
+    @Override
+    public boolean isAdmin(User loginUser)  {
+        return loginUser != null && loginUser.getUserRole() == ADMIN_ROLE;
+    }
+
+    @Override
+    public boolean isAdmin(HttpServletRequest request)  {
+        Object object = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User) object;
+
+        return user != null && user.getUserRole() == ADMIN_ROLE;
     }
 
     /**
