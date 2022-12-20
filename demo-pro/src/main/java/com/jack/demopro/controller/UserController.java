@@ -9,6 +9,7 @@ import com.jack.demopro.model.domain.User;
 import com.jack.demopro.model.domain.request.UserLoginRequest;
 import com.jack.demopro.model.domain.request.UserRegisterRequest;
 import com.jack.demopro.service.UserService;
+import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ import static com.jack.demopro.constant.UserConstant.USER_LOGIN_STATE;
  *
  * @author jiafa
  */
+@Api(tags = "用户模块")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -115,7 +117,7 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public BaseResponse<Integer> updateUser(User user, HttpServletRequest request) {
+    public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
         // 校验参数是否为空
         if (user == null) {
             throw new BusinessException(ErrorCode.PARMS_ERROR);
